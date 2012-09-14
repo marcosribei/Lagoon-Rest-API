@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Lagoon-rest-api : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Lagoon-rest-api</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/marcosribei/Lagoon-Rest-API">View on GitHub</a>
+
+          <h1 id="project_title">Lagoon-rest-api</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/marcosribei/Lagoon-Rest-API/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/marcosribei/Lagoon-Rest-API/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Logotipo</p>
+
+<h1>Access</h1>
+
+<p>To access the RESTful interface the external system should support basi authentication (Login and Password), which must be previously configured in the application.
+<em>+The external system should pass this credencials on the HTTP(Hypertext Transfer Protocol) header on each request+</em>. Otherwhise the response will be "Access denied".</p>
+
+<h1>Request/Response format</h1>
+
+<ul>
+<li><p>Being the API prepared to respond in several formats, for now just JSON((JavaScript Object Notation) format is supported.
+All responses and requests are made in this format, so it is necessary to configure the client to interpret JSON.</p></li>
+<li><p>All request should be made to the <em>subdomain</em> provided, followed by the domain <em>lagoonsecurity.dyndns.org:9091/api</em></p></li>
+</ul><blockquote>
+<p>Example
+<a href="https://demo.lagoonsecurity.dyndns.org:9091/api/sanitycheck">https://demo.lagoonsecurity.dyndns.org:9091/api/sanitycheck</a></p>
+</blockquote>
+
+<ul>
+<li>The error codes used by the API are following:</li>
+</ul><h2>HTTP(Hypertext Transfer Protocol) Error codes</h2>
+
+<p><em>200</em> - Successfull request and valid response 
+<br><em>400</em> - Bad request 
+<br><em>403</em> - Limited permissions 
+<br><em>404</em> - Not found 
+<br><em>409</em> - Request generated conflicts 
+<br><em>500</em> - For all other invalid requests 
+<br><em>503</em> - Unknown errors or temporarily not available</p>
+
+<ul>
+<li><p>All input parameters signed with * are mandatory. 
+All other parameters are optional and can be used to exploit the API's functionalities.</p></li>
+<li><p>For integration tests we recommend "REST Console": <a href="http://www.codeinchaos.com/post/3610180596/rest-console-a-google-chrome-rest-http-client">http://www.codeinchaos.com/post/3610180596/rest-console-a-google-chrome-rest-http-client</a>", or any other client you like. </p></li>
+<li><p>All resources available via RESTful API must be enabled at project#2. Otherwhise it will not be possible to visualize them or interact with them.</p></li>
+</ul><hr><h1>Lagoon RESTful API</h1>
+
+<p>Summary of supported   URI(Uniform Resource Identifier)</p>
+
+<p><strong>Authentication Test</strong><br>
+GET     /sanitycheck/{version}
+<br>GET     /sanitycheck</p>
+
+<p><strong>Application Management</strong><br>
+GET     /</p>
+
+<p><strong>Profiles Management</strong><br>
+GET     /profiles</p>
+
+<p><strong>User Management</strong><br>
+POST    /users
+<br>GET /users/{&lt;[0-9]+&gt;user_id}
+<br>GET /users
+<br>PUT /users/{&lt;[0-9]+&gt;user_id}
+<br>GET     /users/{&lt;[0-9]+&gt;user_id}/deactivate
+<br>GET     /users/{&lt;[0-9]+&gt;user_id}/activate
+<br>GET     /users/{&lt;[0-9]+&gt;user_id}/reactivate
+<br>DELETE  /users/{&lt;[0-9]+&gt;user_id}
+<br>POST    /users/login<br><br>GET     /users/{&lt;[0-9]+&gt;user_id}/logout 
+<br>GET /users/{&lt;[0-9]+&gt;user_id}/permissions
+<br>POST    /users/register
+<br>GET /users/{&lt;[0-9]+&gt;user_id}/profiles</p>
+
+<p><strong>Context Management</strong><br>
+GET /contexts
+<br>POST    /contexts<br><br>GET /contexts/{cname}
+<br>PUT /contexts/{cname}
+<br>DELETE  /contexts/{cname}
+<br>GET /contexts/{cname}/enable
+<br>GET /contexts/{cname}/disable</p>
+
+<p><strong>Contextualized resources Management</strong><br>
+GET /contexts/{cname}/profiles
+<br>POST    /contexts/{cname}/users
+<br>GET /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}
+<br>GET /contexts/{cname}/users 
+<br>PUT /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}
+<br>GET     /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/deactivate
+<br>GET     /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/activate
+<br>GET     /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/reactivate
+<br>DELETE  /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/reactivate
+<br>POST    /contexts/{cname}/users/login
+<br>GET     /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/logout<br><br>GET /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/permissions
+<br>POST    /contexts/{cname}/users/register
+<br>GET /contexts/{cname}/users/{&lt;[0-9]+&gt;user_id}/profiles</p>
+
+<hr><h1>Request Description</h1>
+
+<h2>Authentication/Autorization Test:</h2>
+
+<h3>/sanitycheck</h3>
+
+<p>Checks the authentication credentials and that the application is active. Returns the message "Application appName is ok!". 
+This message indicates that the credencials are correct and the application is ready to interact with  project#2. Compatibility between versions is not garanteed.</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong>  N/A <br><strong>Example Input:</strong><br></p>
+
+<pre><code></code></pre>
+
+<p><strong>Example Output:</strong></p>
+
+<pre><code>{
+    sanity: true,
+    message: "Application xcoisas - demo is ok!",
+    version: "0.1beta"
+}</code></pre>
+
+<p><strong>/sanitycheck/</strong><br>
+Checks compatibility between  versions. 
+The request is made with a parameter <em>version</em> and project#2 indicates if this version is comptible with its own using the <em>sanity</em> flag. </p>
+
+<p><strong>Example</strong>:<br> /sanitycheck/0.1beta2</p>
+
+<p><strong>HTTP Method:</strong> GET<br><strong>Parameters:</strong> <strong>version</strong> Identification of the version used by the client<br><strong>Example Input:</strong> N/A<br><strong>Example Output</strong><br></p>
+
+<pre><code>{
+    sanity: true,
+    message: "Application xcoisas - demo is ok!",
+    version: "0.1beta"
+}</code></pre>
+
+<p><strong>Exemplo Output</strong> <br>
+with non compatible version</p>
+
+<pre><code>{
+    sanity: false,
+    message: "Version :: 0.1beta2 :: not supported",
+    version: "0.1beta"
+}</code></pre>
+
+<h2>Management of the application instance</h2>
+
+<p>Retrieves all information about the application instance which corresponds to the login and organization being used. Must be prevously configured at  project#2.</p>
+
+<p><strong>HTTP Method :</strong> GET<br><strong>Parameters:</strong> N/A <br><strong>Example input:</strong> N/A <br>
+*<em>Example Output: *</em></p>
+
+<pre><code>{
+    "notify": true,
+    "activationUrl": "",
+    "description": "",
+    "name": "demo",
+    "url": "",
+    "application": {
+        "description": "Buy and Sell your products",
+        "name": "xcoisas"
+    }
+}</code></pre>
+
+<h2>Profiles Management</h2>
+
+<h3>/profiles<br>
+</h3>
+
+<p>Retrieves a list of all active profiles of the application</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> N/A <br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong></p>
+
+<pre><code>[{
+    "id": 16,
+    "defaultProfile": false,
+    "description": "admin profile",
+    "name": "admin"
+}, {
+    "id": 17,
+    "defaultProfile": false,
+    "description": "",
+    "name": "test"
+}, {
+    "id": 18,
+    "defaultProfile": true,
+    "description": "",
+    "name": "guest"
+}]</code></pre>
+
+<hr><h2>User Management</h2>
+
+<h3>/users<br>
+</h3>
+
+<p>Creates a new User. If no profile is specified the user will be associated with the "guest" profiles, which may or may not have active permissions. 
+The option field "ghost" allows the creation of ghost users which are users who don't receive any kind of notification whenever they are activated/deactivated.</p>
+
+<p><strong>HTTP Method:</strong> POST <br><strong>Paramenters:</strong> N/A <br><strong>Example Input</strong> <br></p>
+
+<pre><code>{
+   *"login": "user1",
+   *"email": "user1@mail.pt",
+   *"name": "User1",
+    "ghost":false,
+    "profiles": [
+        {
+            "name": "admin"
+        }
+    ]
+}</code></pre>
+
+<p><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": false,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }],
+    "token": "7fcebcdeb9f84a329d84ef56d11ee89a1343212496121"
+}
+</code></pre>
+
+<h3>/users/register<br>
+</h3>
+
+<p>Registers a users password of a newly created user and activates his account.</p>
+
+<p><strong>HTTP Method:</strong> POST <br><strong>Parameters:</strong> N/A <br><strong>Example Input</strong>
+ </p><pre><code>{
+   *"token":"7fcebcdeb9f84a329d84ef56d11ee89a1343212496121",
+   *"password": "pass"
+}</code></pre>
+
+<p><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "profile": "admin",
+        "actions": {
+            "Users": ["reactivate", "deactivate", "show", "activate", "index"],
+            "Application": ["index"],
+            "Apps": ["show"],
+            "Contexts": ["show", "update", "index", "delete", "edit", "save", "create"],
+            "Permissions": ["index"]
+        }
+    }]
+}</code></pre>
+
+<h3>/users/{id_u}/activate</h3>
+
+<p>Activate an users account. Can only be used for disabled users which already where registered.</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>id_u</strong> User Identification<br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "profile": "admin",
+        "actions": {
+            "Users": ["reactivate", "deactivate", "show", "activate", "index"],
+            "Application": ["index"],
+            "Apps": ["show"],
+            "Contexts": ["show", "update", "index", "delete", "edit", "save", "create"],
+            "Permissions": ["index"]
+        }
+    }]
+}</code></pre>
+
+<h3>/users/{id_u}/deactivate</h3>
+
+<p>Disables an users account. Can only be used for active users.</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>id_u</strong> User Identification <br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": false,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user@mail.pt",
+    "profiles": [{
+        "profile": "admin",
+        "actions": {
+            "Users": ["reactivate", "deactivate", "show", "activate", "index"],
+            "Application": ["index"],
+            "Apps": ["show"],
+            "Contexts": ["show", "update", "index", "delete", "edit", "save", "create"],
+            "Permissions": ["index"]
+        }
+    }]
+}</code></pre>
+
+<h3>/users/{id_u}/reactivate</h3>
+
+<p>Reactivates an users account. This means the user receives a new notification with an activation url. Can only be used for users which where never registered.</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>id_u</strong> User identification<br><strong>Example Input:</strong> N/A<br><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "profile": "admin",
+        "actions": {
+            "Users": ["reactivate", "deactivate", "show", "activate", "index"],
+            "Application": ["index"],
+            "Apps": ["show"],
+            "Contexts": ["show", "update", "index", "delete", "edit", "save", "create"],
+            "Permissions": ["index"]
+        }
+    }],
+    "token": "df8c7e2b9950479fb327b3c336f472021343212870715"
+}</code></pre>
+
+<h3>/users/{id_u}</h3>
+
+<p>Deletes an user.</p>
+
+<p><strong>HTTP Method:</strong> DELETE <br><strong>Parameters</strong> <strong>id_u</strong> User identification<br><strong>Example Input</strong> N/A<br><strong>Example Output</strong></p>
+
+<pre><code>{
+    "success": true
+}</code></pre>
+
+<h3>/users</h3>
+
+<p>Retrieves a list of all users (active or not).</p>
+
+<p><strong>HTTP Method</strong> GET <br><strong>Parameters:</strong> N/A <br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong></p>
+
+<pre><code>[{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }]
+}, {
+    "id": 14,
+    "enable": false,
+    "ghost": false,
+    "login": "user2",
+    "name": "user2",
+    "email": "user2@mail.pt",
+    "profiles": [{
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}]</code></pre>
+
+<h3>/users/{id_u}</h3>
+
+<p>Retrieves all information about an user.</p>
+
+<p><strong>HTTP Method:</strong> GET<br><strong>Parameters:</strong>id_u** User identification<br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user1",
+    "name": "User1",
+    "email": "user1@mai.pt"
+    "profiles": [{
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }]
+}</code></pre>
+
+<h3>/users/{id_u}</h3>
+
+<p>Updated an User.</p>
+
+<p><strong>HTTP Method:</strong> PUT <br><strong>Parameters:</strong> <strong>id_u</strong> User Identification
+<strong>Example Input</strong></p>
+
+<pre><code>{
+    *"login": "user3",
+    *"email": "user3@mail.pt",
+    *"name": "user1"
+}</code></pre>
+
+<p><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user3",
+    "name": "user1",
+    "email": "user1@mail.pt",
+    "profiles": [{
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}</code></pre>
+
+<h3>/users/login</h3>
+
+<p>User Login. The response contains all information about the users access permission (profiles, actions and action points)</p>
+
+<p><strong>HTTP Method:</strong>POST<br><strong>Parameters:</strong> N/A <br>
+*<em>Example input *</em>
+ </p><pre><code></code></pre>{
+    *login: user3,
+    *password: pass
+}
+Example Output
+
+<pre><code>{
+    "id": 13,
+    "enable": true,
+    "ghost": false,
+    "login": "user3",
+    "name": "user1",
+    "email": "user1@xlm.pt",
+    "profiles": [{
+        "profile": "guest",
+        "actions": {
+            "Conditions": ["edit", "index", "show", "update", "create", "delete", "save"],
+            "Types": ["delete", "show", "create", "update", "save", "index", "edit"],
+            "Users": ["edit", "indexByContext", "show", "update", "showUser"],
+            "Purchases": ["index"],
+            "Products": ["show", "save", "create", "buy", "delete", "index", "update", "edit"],
+            "Application": ["index"]
+        }
+    }],
+    "lastLogin": 1343213324000
+}</code></pre>
+
+<h3>/users/{id_u}/logout</h3>
+
+<p>User Logout</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>id_u</strong> User Identification <br><strong>Example Input:</strong> N/A <br>
+*<em>Example Output *</em></p>
+
+<pre><code>{
+    success: true
+}</code></pre>
+
+<hr><h2>Permissions</h2>
+
+<h3>/users/{id_u}/permissions</h3>
+
+<p>Retrieves users permissions ordered by Profile/Action/ActionPoint. If an actionPoint is not present it means the user has no permission to use it</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>id_u</strong> User Identification <br><strong>Example Input:</strong> N/A <br><strong>Example Output:</strong></p>
+
+<pre><code>[{
+    "profile": "guest",
+    "actions": {
+        "Conditions": ["edit", "index", "show", "update", "create", "delete", "save"],
+        "Types": ["delete", "show", "create", "update", "save", "index", "edit"],
+        "Users": ["edit", "indexByContext", "show", "update", "showUser"],
+        "Purchases": ["index"],
+        "Products": ["show", "save", "create", "buy", "delete", "index", "update", "edit"],
+        "Application": ["index"]
+    }
+}]</code></pre>
+
+<h2>Contextualized Resources</h2>
+
+<p>Client applications which need to contextualized their resources (used of subdomains, for example) should used specific routes.
+When building the route dinamically  it is only necessary to include the <em>context</em> resource followed by the name of the context to use.</p>
+
+<p><strong>Example:</strong><br></p>
+
+<ul>
+<li>/ <em>contexts/xyz/</em> users/34/activate
+This URI will activate the userd with id <em>34</em> inserted in context <em>xyz</em>
+</li>
+</ul><p>All parameters are the same as in the previously decribed routes.</p>
+
+<h2>Context Management</h2>
+
+<p>At  project:lagoon contexts are used as users and profiles agglomerators. This allows the client applications to support their contexts, as for example, subdomains. It can only be made use of contexts if the application if configured to operate in Saas mode.</p>
+
+<h2>contexts</h2>
+
+<p>Restrieves a list of all contexts</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong>N/A <br><strong>Example Input:</strong> N/A<br><strong>Example Output</strong></p>
+
+<pre><code>[{
+    "id": 19,
+    "defaultContext": true,
+    "enable": true,
+    "name": "default",
+    "description": "Default Context",
+    "profiles": [{
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}, {
+    "id": 21,
+    "defaultContext": false,
+    "enable": true,
+    "name": "admin",
+    "description": "administration area",
+    "activationUrl": "",
+    "url": "http://admin.lvh.me:9000/",
+    "profiles": [{
+        "id": 17,
+        "defaultProfile": false,
+        "description": "",
+        "name": "test"
+    }, {
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }, {
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}, {
+    "id": 20,
+    "defaultContext": false,
+    "enable": true,
+    "name": "test",
+    "description": "context context",
+    "profiles": [{
+        "id": 17,
+        "defaultProfile": false,
+        "description": "",
+        "name": "test"
+    }, {
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }, {
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}, {
+    "id": 22,
+    "defaultContext": false,
+    "enable": true,
+    "name": "xcoisas",
+    "description": "",
+    "activationUrl": "http://xcoisas.lvh.me:9000/activation",
+    "url": "http://xcoisas.lvh.me:9000",
+    "profiles": [{
+        "id": 17,
+        "defaultProfile": false,
+        "description": "",
+        "name": "test"
+    }, {
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }, {
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}]
+</code></pre>
+
+<h2>/contexts</h2>
+
+<p>Creates a new context. 
+The parameter <em>copycontext</em> can be used to copy profiles from the indicated context. It not set all enabled context are associated to the new context. </p>
+
+<p><strong>HTTP Method:</strong>POST<br><strong>Parameters:</strong>N/A<br><strong>Exemplo Input</strong></p>
+
+<pre><code>{
+     *"name": "context name",
+     "activationUrl": "www.example.pt",
+     "url": "www.admin.pt",
+     "description": "context description",
+     "copycontext": "test"
+}</code></pre>
+
+<p><strong>Exemplo Output</strong></p>
+
+<pre><code>{
+    "id": 23,
+    "defaultContext": false,
+    "enable": true, 
+    "name": "context name",
+    "description": "context description",
+    "activationUrl": "http://www.example.pt",
+    "url": "http://www.admin.pt",
+    "profiles": [{
+        "id": 17,
+        "defaultProfile": false,
+        "description": "",
+        "name": "test"
+    }, {
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }, {
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}
+</code></pre>
+
+<h3>/contexts/{cname}</h3>
+
+<p>Updates a context</p>
+
+<p><strong>HTTP Method:</strong> PUT <br><strong>Parameters</strong> <strong>cname</strong> Context Name<br><strong>Example Input</strong></p>
+
+<pre><code>{
+    *"name": "editado",
+    "description": "Default Context",
+    "url": "http://www.example.com",
+     "activationUrl": "http://www.example.com/activation"
+}</code></pre>
+
+<p><strong>Example Output</strong></p>
+
+<pre><code>{
+    "id": 19,
+    "defaultContext": false,
+    "enable": true, 
+    "name": "editado",
+    "description": "Default Context",
+    "activationUrl": "http://www.example.com/activation",
+    "url": "http://www.example.com",
+    "profiles": [{
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}</code></pre>
+
+<h3>/contexts/{cname}</h3>
+
+<p>Retrieves a contexts information</p>
+
+<p><strong>HTTP Method:</strong> GET<br><strong>Parametros:</strong> <strong>cname</strong> Context Name<br><strong>Example Input:</strong> N/A <br><strong>Example Output:</strong></p>
+
+<pre><code>{
+    "id": 21,
+    "defaultContext": false,
+    "enable": true, 
+    "name": "admin",
+    "description": "administration area",
+    "activationUrl": "",
+    "url": "http://admin.lvh.me:9000/",
+    "profiles": [{
+        "id": 17,
+        "defaultProfile": false,
+        "description": "",
+        "name": "test"
+    }, {
+        "id": 16,
+        "defaultProfile": false,
+        "description": "admin profile",
+        "name": "admin"
+    }, {
+        "id": 18,
+        "defaultProfile": true,
+        "description": "",
+        "name": "guest"
+    }]
+}</code></pre>
+
+<h3>/contexts/{cname}</h3>
+
+<p>Deletes a context. Default context can not be deleted</p>
+
+<p><strong>HTTP Method:</strong> DELETE <br><strong>Parameters</strong> <strong>cname</strong> Context Name <br><strong>Example Input:</strong>N/A <br><strong>Example Output</strong></p>
+
+<pre><code>{
+    success: true
+}</code></pre>
+
+<h3>/contexts/{cname}/enable</h3>
+
+<p>Enables context</p>
+
+<p><strong>HTTP Method:</strong> GET <br><strong>Parameters:</strong> <strong>cname</strong> Context name<br><strong>Example Input:</strong> N/A <br><strong>Example Output:</strong> N/A <br></p>
+
+<pre><code>{
+    success: true
+}</code></pre>
+
+<h3>/contexts/{cname}/disable</h3>
+
+<p>Disables context. Default Context can not be disabled<br><strong>Verbo HTTP:</strong> GET <br><strong>Parameters:</strong> <strong>cname</strong> Context name<br><strong>Example Input:</strong> N/A <br><strong>Example Output</strong> N/A <br></p>
+
+<pre><code>{
+    success: true
+}</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Lagoon-rest-api maintained by <a href="https://github.com/marcosribei">marcosribei</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
